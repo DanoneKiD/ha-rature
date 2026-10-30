@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Matrice de points</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Doto:wght@700;900&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background-color: #F3F3F1; background-image: radial-gradient(#D6D6D2 1px, transparent 1.3px); background-size: 12px 12px; color: #111111; font-family: 'Space Mono', monospace;">
+  <div style="padding: 46px 22px 0; display: flex; flex-direction: column; gap: 4px;">
+    <span style="display: flex; align-items: center; gap: 8px; font-size: 12px; letter-spacing: .12em;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #D71921;"></span>EN DIRECT · HOME ASSISTANT</span>
+    <h1 style="margin: 0; font-family: Doto, monospace; font-weight: 900; font-size: 58px; line-height: 1; letter-spacing: -0.02em;">COURSES</h1>
+    <span style="font-family: Doto, monospace; font-weight: 700; font-size: 26px;">07 / 08</span>
+  </div>
+  <div style="padding: 22px 16px 0; display: flex; flex-direction: column; gap: 12px;">
+    <div style="background: #FFFFFF; border-radius: 20px; padding: 14px 16px; display: flex; flex-direction: column; gap: 2px;">
+      <span style="font-size: 11px; letter-spacing: .14em; color: #6A6A66;">FRUITS ET LÉGUMES</span>
+      <span style="display: flex; align-items: center; gap: 12px; height: 40px; font-size: 16px;"><span style="width: 18px; height: 18px; border-radius: 50%; border: 2px dotted #111111;"></span>Bananes<span style="margin-left: auto; color: #6A6A66;">6</span></span>
+      <span style="display: flex; align-items: center; gap: 12px; height: 40px; font-size: 16px;"><span style="width: 18px; height: 18px; border-radius: 50%; border: 2px dotted #111111;"></span>Tomates<span style="margin-left: auto; color: #6A6A66;">1KG</span></span>
+      <span style="display: flex; align-items: center; gap: 12px; height: 40px; font-size: 16px;"><span style="width: 18px; height: 18px; border-radius: 50%; border: 2px dotted #111111;"></span>Avocats<span style="font-size: 11px; color: #6A6A66;">· ALEX</span><span style="margin-left: auto; color: #6A6A66;">2</span></span>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px;">
+      <div style="background: #FFFFFF; border-radius: 20px; padding: 14px 16px; display: flex; flex-direction: column; gap: 2px;">
+        <span style="font-size: 11px; letter-spacing: .14em; color: #6A6A66;">CRÈMERIE</span>
+        <span style="display: flex; align-items: center; gap: 10px; height: 40px; font-size: 16px;"><span style="width: 16px; height: 16px; border-radius: 50%; border: 2px dotted #111111;"></span>Lait</span>
+        <span style="display: flex; align-items: center; gap: 10px; height: 40px; font-size: 16px;"><span style="width: 16px; height: 16px; border-radius: 50%; background: #D71921;"></span>Œufs</span>
+      </div>
+      <div style="background: #111111; color: #F3F3F1; border-radius: 20px; padding: 14px 16px; display: flex; flex-direction: column; gap: 2px;">
+        <span style="font-size: 11px; letter-spacing: .14em; color: #A5A5A0;">ÉPICERIE</span>
+        <span style="display: flex; align-items: center; gap: 10px; height: 40px; font-size: 16px;"><span style="width: 16px; height: 16px; border-radius: 50%; background: #D71921;"></span>Café</span>
+        <span style="display: flex; align-items: center; gap: 10px; height: 40px; font-size: 16px;"><span style="width: 16px; height: 16px; border-radius: 50%; border: 2px dotted #F3F3F1;"></span>Pâtes</span>
+      </div>
+    </div>
+    <span style="display: flex; align-items: center; gap: 8px; font-size: 11px; color: #6A6A66; padding: 0 4px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #D71921;"></span>POINT ROUGE = AJOUTÉ PAR LA VOIX · 1 DANS LE PANIER</span>
+  </div>
+  <div style="position: absolute; left: 16px; right: 16px; bottom: 24px; height: 60px; border-radius: 30px; background: #111111; color: #F3F3F1; display: flex; align-items: center; gap: 10px; padding: 0 8px 0 22px; font-size: 15px;">
+    <span style="flex: 1; color: #A5A5A0;">AJOUTER_</span>
+    <span style="width: 44px; height: 44px; border-radius: 50%; background: #D71921; display: flex; align-items: center; justify-content: center; font-family: Doto, monospace; font-weight: 900; font-size: 28px;">+</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

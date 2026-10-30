@@ -1,0 +1,17 @@
+/* Commun à tous les skins : marges du système données par la coquille (--safe-*), sinon par le
+   navigateur (env()). La coquille impose ses valeurs par une règle html:root plus spécifique. */
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  overscroll-behavior: none; -webkit-tap-highlight-color: transparent;
+  /* Une app, pas une page : l'appui long ne sélectionne pas le texte (Android proposait « Copier »). */
+  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+}
+input, textarea { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }
+button, input { font: inherit; color: inherit; }

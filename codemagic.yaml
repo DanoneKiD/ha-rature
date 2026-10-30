@@ -1,0 +1,86 @@
+# Rature : pipeline Codemagic, iOS seulement.
+#
+# Android ne passe pas par ici : l'AAB se construit en local (`npm run app`, puis
+# `flutter build appbundle --release` dans app/, signé par secret/key.properties) et part sur Play.
+#
+# Ce qu'il faut côté Codemagic : l'app reliée à ce dépôt, une clé App Store Connect déclarée dans
+# les intégrations de l'équipe (voir `app_store_connect` plus bas), le profil de provisionnement.
+#
+# Pas de workflow de vérification : un build quand tout est prêt.
+# Il se lance en poussant une étiquette (`git tag ios-v1.0.0 && git push origin ios-v1.0.0`), et
+# le build envoie l'app à l'examen d'Apple.
+
+definitions:
+  flutter_version: &flutter_version 3.47.2
+
+workflows:
+
+  # ---------------------------------------------------------------------------
+  # iOS : IPA signé, envoyé sur App Store Connect et soumis à l'examen d'Apple, mis en vente dès
+  # qu'il est approuvé. La 1.0.0 (2026-10-27) est partie sans soumission automatique : les premiers
+  # achats intégrés doivent accompagner une version, cochés sur sa page, et l'API refuse de les
+  # soumettre seuls. Les pourboires approuvés, chaque mise à jour peut se soumettre seule.
+  # ---------------------------------------------------------------------------
+  ios-release:
+    name: iOS, IPA vers l'App Store (examen puis mise en vente)
+    instance_type: mac_mini_m2
+    triggering:
+      events:
+        - tag
+      tag_patterns:
+        - pattern: 'ios-v*'
+          include: true
+    # Un build iOS Flutter prend 15 à 25 min.
+    max_build_duration: 40
+    integrations:
+      app_store_connect: stopsmoke_asc
+    environment:
+      flutter: *flutter_version
+      vars:
+        APP_STORE_APPLE_ID: 6827473875
+      node: 24
+      xcode: latest
+      cocoapods: default
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.danonekid.rature
+    cache:
+      cache_paths:
+        - $HOME/.pub-cache
+        - $HOME/Library/Caches/CocoaPods
+        - $CM_BUILD_DIR/node_modules
+    scripts:
+      # L'interface web, un seul fichier HTML copié dans app/assets/app.html (non versionné).
+      - name: Construire l'interface et la copier dans l'app
+        script: |
+          set -e
+          npm ci
+          npm test
+          npm run app
+      - name: Dépendances Dart
+        script: cd app && flutter pub get
+      - name: flutter analyze
+        script: cd app && flutter analyze
+      - name: Installer les pods
+        script: cd app/ios && pod install
+      - name: Appliquer les profils de provisionnement
+        script: cd app && xcode-project use-profiles
+      # Le numéro de build suit celui d'App Store Connect (le 1 de la 1.0.0 ne se réutilise pas).
+      - name: Construire l'IPA
+        script: |
+          set -e
+          BUILD_NUMBER=$(($(app-store-connect get-latest-app-store-build-number "$APP_STORE_APPLE_ID") + 1))
+          echo "Numéro de build : $BUILD_NUMBER"
+          cd app && flutter build ipa --release --build-number="$BUILD_NUMBER" \
+            --export-options-plist=/Users/builder/export_options.plist
+
+    artifacts:
+      - app/build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: false
+        submit_to_app_store: true
+        release_type: AFTER_APPROVAL

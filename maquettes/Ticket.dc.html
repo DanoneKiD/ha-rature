@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Ticket de caisse</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #2B2D31; font-family: 'IBM Plex Mono', monospace; color: #232323;">
+  <div style="position: absolute; left: 28px; right: 28px; top: 34px; bottom: 96px; background: #FBFAF6; box-shadow: 0 10px 30px rgba(0,0,0,.35); padding: 26px 22px; display: flex; flex-direction: column; gap: 6px; font-size: 14px; transform: rotate(-.6deg);">
+    <div style="text-align: center; display: flex; flex-direction: column; gap: 2px;">
+      <span style="font-size: 20px; font-weight: 700; letter-spacing: .12em;">LA MAISON</span>
+      <span style="font-size: 12px;">LISTE DE COURSES N° 0042</span>
+      <span style="font-size: 12px;">25/10/2026 22:14 · SAM + ALEX</span>
+    </div>
+    <span style="border-top: 1.5px dashed #232323; margin: 8px 0 4px;"></span>
+    <span style="font-weight: 700;">** FRUITS ET LÉGUMES</span>
+    <span style="display: flex; gap: 8px;"><span>[ ]</span><span style="flex: 1;">BANANES</span><span>x6</span></span>
+    <span style="display: flex; gap: 8px;"><span>[ ]</span><span style="flex: 1;">TOMATES</span><span>1KG</span></span>
+    <span style="display: flex; gap: 8px;"><span>[ ]</span><span style="flex: 1;">AVOCATS <span style="font-size: 11px;">(ALEX)</span></span><span>x2</span></span>
+    <span style="display: flex; gap: 8px; color: #8A8A85;"><span>[x]</span><span style="flex: 1; text-decoration: line-through;">POMMES</span><span>OK</span></span>
+    <span style="font-weight: 700; margin-top: 6px;">** CRÈMERIE</span>
+    <span style="display: flex; gap: 8px;"><span>[ ]</span><span style="flex: 1;">LAIT</span><span>2L</span></span>
+    <span style="display: flex; gap: 8px;"><span>[ ]</span><span style="flex: 1;">ŒUFS <span style="font-size: 11px;">(VOIX)</span></span><span>x12</span></span>
+    <span style="font-weight: 700; margin-top: 6px;">** ÉPICERIE</span>
+    <span style="display: flex; gap: 8px;"><span>[ ]</span><span style="flex: 1;">CAFÉ <span style="font-size: 11px;">(VOIX)</span></span><span>x1</span></span>
+    <span style="display: flex; gap: 8px;"><span>[ ]</span><span style="flex: 1;">PÂTES</span><span>x1</span></span>
+    <span style="border-top: 1.5px dashed #232323; margin: 8px 0 4px;"></span>
+    <span style="display: flex; font-weight: 700; font-size: 16px;"><span style="flex: 1;">RESTE À PRENDRE</span><span>7</span></span>
+    <span style="display: flex; font-size: 12px;"><span style="flex: 1;">DANS LE PANIER</span><span>1</span></span>
+    <span style="margin-top: auto; height: 46px; background: repeating-linear-gradient(90deg, #232323 0 2px, transparent 2px 4px, #232323 4px 7px, transparent 7px 9px, #232323 9px 10px, transparent 10px 13px);"></span>
+    <span style="text-align: center; font-size: 12px; letter-spacing: .2em;">MERCI, À BIENTÔT</span>
+  </div>
+  <div style="position: absolute; left: 20px; right: 20px; bottom: 22px; height: 54px; border-radius: 12px; background: #3A3D42; color: #E8E6DF; display: flex; align-items: center; gap: 10px; padding: 0 8px 0 16px; font-size: 15px;">
+    <span style="color: #9BE3A0;">&gt;</span><span style="flex: 1; color: #A9ABB0;">AJOUTER UN ARTICLE_</span>
+    <span style="width: 40px; height: 40px; border-radius: 8px; background: #E8E6DF; color: #2B2D31; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 22px;">+</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

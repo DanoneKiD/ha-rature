@@ -1,0 +1,221 @@
+/* Skin « Carnet de courses », d'après maquettes/Carnet.dc.html : papier ligné tous les 40 px,
+   marge rouge, bout de scotch, écriture Caveat, coches au feutre.
+   Tout tient sur la ligne de 40 px : chaque élément fait 40 px de haut, ou un multiple. */
+@import '@fontsource/caveat/latin-500.css';
+@import '@fontsource/caveat/latin-700.css';
+@import '@fontsource/courier-prime/latin-400.css';
+
+.carnet {
+  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+  --papier: #F7F1E3;
+  --ligne: #BFD0DC;
+  --marge: #E2A0A0;
+  --encre: #23324A;
+  --gris: #6A7385;
+  --pale: #9AA3B2;
+  --rouge: #B0453A;
+  --autre: #7A3E8F;
+  --vert: #2E7D4F;
+  --scotch: rgba(214, 196, 150, .75);
+  --haut: calc(var(--safe-top) + 10px);
+
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  background-color: var(--papier);
+  background-image: repeating-linear-gradient(var(--papier) 0 39px, var(--ligne) 39px 40px);
+  background-position: 0 var(--haut);
+  color: var(--encre);
+  font-family: Caveat, cursive;
+  padding-bottom: calc(120px + var(--safe-bottom));
+}
+.carnet__marge { position: absolute; left: 52px; top: 0; bottom: 0; width: 2px; background: var(--marge); }
+.carnet__scotch {
+  /* Un bout de scotch en biais sur le coin, au-dessus de la marge : il ne cache pas le titre. */
+  position: absolute; left: -18px; top: calc(var(--safe-top) + 2px); width: 96px; height: 28px;
+  background: var(--scotch); transform: rotate(-38deg);
+}
+/* L'en-tête tient sur les deux premières lignes du papier : la place va à la liste. */
+.carnet__page {
+  position: relative;
+  padding: var(--haut) calc(24px + var(--safe-right)) 0 calc(68px + var(--safe-left));
+  display: flex; flex-direction: column;
+}
+.carnet__tete { display: flex; align-items: center; justify-content: space-between; gap: 10px; height: 80px; }
+.carnet__titre {
+  flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  margin: 0; font-size: clamp(40px, 13vw, 54px); font-weight: 700; line-height: 80px; transform: rotate(-1.5deg);
+  background: none; border: 0; padding: 0 6px 0 0; cursor: pointer; text-align: left;
+}
+.carnet__titre--long {
+  white-space: normal; font-size: 30px; line-height: 40px; overflow-wrap: anywhere;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; max-height: 80px;
+}
+.carnet__infos { flex: none; display: flex; flex-direction: column; align-items: flex-end; white-space: nowrap; }
+.carnet__date, .carnet__etat {
+  font-family: 'Courier Prime', monospace; color: var(--gris);
+}
+.carnet__date { font-size: 11px; line-height: 20px; }
+.carnet__etat { font-size: 11px; line-height: 20px; color: var(--rouge); }
+.carnet__etat:empty { display: none; }
+/* Connexion en cours : trois points d'encre qui s'écrivent l'un après l'autre. */
+.carnet__plume { display: inline-flex; gap: 3px; vertical-align: middle; }
+.carnet__plume i {
+  width: 4px; height: 4px; border-radius: 50%; background: var(--encre);
+  animation: plume 1.1s ease-in-out infinite; animation-delay: calc(var(--n, 0) * .18s);
+}
+.carnet__plume i:nth-child(2) { --n: 1; }
+.carnet__plume i:nth-child(3) { --n: 2; }
+@keyframes plume { 0%, 60%, 100% { transform: translateY(0); opacity: .35; } 30% { transform: translateY(-4px); opacity: 1; } }
+/* Tri et réglages : deux icônes, chacune une cible de 40 px (une ligne du papier). */
+.carnet__outils { display: flex; margin-right: -9px; }
+.carnet__outil {
+  width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+  background: none; border: 0; padding: 0; color: var(--encre); cursor: pointer; border-radius: 50%;
+}
+.carnet__outil--tasse { color: var(--rouge); }
+.carnet__outil:active { background: rgba(35, 50, 74, .08); }
+.carnet__rayon { height: 40px; line-height: 40px; font-size: 20px; color: var(--rouge); font-weight: 700; }
+.carnet__article {
+  height: 40px; line-height: 40px; font-size: 27px; display: flex; align-items: center; gap: 12px;
+  background: none; border: 0; padding: 0; text-align: left; cursor: pointer; width: 100%;
+  white-space: nowrap; overflow: hidden; touch-action: pan-y; user-select: none;
+}
+.carnet__case {
+  flex: none; width: 18px; height: 18px; border: 2px solid currentColor; border-radius: 3px;
+  position: relative; transform: rotate(var(--r, 0deg));
+}
+.carnet__case svg { position: absolute; left: -3px; top: -9px; }
+.carnet__nom { position: relative; overflow: hidden; text-overflow: ellipsis; padding-right: 6px; margin-right: -6px; } /* Caveat penche ses accents à droite : sans marge, le é final est rogné. */
+.carnet__qte { color: var(--gris); font-size: 22px; }
+.carnet__par { font-size: 19px; }
+.carnet__article--autre { color: var(--autre); }
+.carnet__article--fait { color: var(--gris); }
+.carnet__article--fait .carnet__case { border-color: var(--encre); }
+/* Coché : un trait de feutre sur le nom, qui se dessine au moment du cochage (carnet.js). */
+.carnet__rature, .carnet__griffe { position: absolute; pointer-events: none; overflow: visible; }
+.carnet__rature { left: -2px; right: 4px; top: 50%; height: 12px; margin-top: -4px; width: calc(100% - 2px); }
+.carnet__rature path, .carnet__griffe path, .carnet__case path {
+  fill: none; stroke-linecap: round; stroke-dasharray: 1; vector-effect: non-scaling-stroke;
+}
+.carnet__rature path { stroke: var(--encre); stroke-width: 2.5; }
+.carnet__griffe { left: 20px; right: 0; top: 8px; height: 24px; width: calc(100% - 20px); }
+.carnet__griffe path { stroke: var(--rouge); stroke-width: 3.5; }
+
+/* Doublon : un coup de surligneur sur le nom. */
+.carnet__article--surligne .carnet__nom {
+  background: linear-gradient(transparent 52%, rgba(255, 226, 64, .75) 52% 88%, transparent 88%) no-repeat 0 0 / 100% 100%;
+  animation: surligner .45s ease-out;
+}
+@keyframes surligner { from { background-size: 0 100%; } }
+
+/* Ligne du tri, sous le titre. */
+/* « Dans le panier (n) » : les cochés, en bas, repliables. */
+.carnet__panier-tete { display: flex; align-items: center; justify-content: space-between; margin-top: 40px; }
+.carnet__panier {
+  display: flex; align-items: center; gap: 6px; height: 40px; padding: 0; border: 0; background: none;
+  font-family: Caveat, cursive; font-size: 22px; font-weight: 700; color: var(--gris); cursor: pointer; transform-origin: 0 50%;
+}
+.carnet__chevron { transition: transform .25s ease; }
+.carnet__panier[aria-expanded="true"] .carnet__chevron { transform: rotate(90deg); }
+.carnet__panier-zone .carnet__article { opacity: .85; }
+.carnet__vider { color: var(--gris); margin-right: -9px; }
+.carnet__voile { position: fixed; inset: 0; z-index: 39; background: rgba(35, 50, 74, .08); animation: voile .2s ease-out; }
+.carnet__voile[hidden] { display: none; }
+@keyframes voile { from { opacity: 0; } }
+.carnet__question-etiquette { font-family: 'Courier Prime', monospace; font-size: 12px !important; color: var(--gris); margin: 4px 0 2px !important; }
+.carnet__saisie {
+  height: 40px; line-height: 40px; font-size: 27px; font-family: Caveat, cursive; color: var(--encre);
+  background: none; border: 0; padding: 0; outline: none; width: 100%;
+}
+.carnet__saisie::placeholder { color: var(--pale); opacity: 1; }
+.carnet__vide { height: 40px; line-height: 40px; font-size: 24px; color: var(--pale); }
+.carnet__stylo {
+  position: fixed; right: calc(22px + var(--safe-right)); bottom: calc(32px + var(--safe-bottom));
+  width: 64px; height: 64px; border-radius: 50%; border: 0; background: var(--encre); color: var(--papier);
+  display: flex; align-items: center; justify-content: center; box-shadow: 2px 3px 0 rgba(35, 50, 74, .25);
+  cursor: pointer;
+}
+.carnet__mot {
+  position: fixed; left: 50%; bottom: calc(110px + var(--safe-bottom)); transform: translateX(-50%) rotate(-1deg);
+  background: #FFF7B8; color: var(--encre); font-size: 22px; padding: 6px 14px;
+  box-shadow: 1px 2px 0 rgba(35, 50, 74, .2); pointer-events: none; transition: opacity .3s;
+}
+.carnet__mot[hidden] { display: block; opacity: 0; }
+.carnet__mot:not([hidden]) { animation: coller .32s cubic-bezier(.3, 1.5, .5, 1); }
+/* Un post-it se colle : il arrive un peu grand et penché, puis se pose. */
+.carnet__question:not([hidden]) { animation: coller-postit .32s cubic-bezier(.3, 1.5, .5, 1); }
+@keyframes coller { from { opacity: 0; transform: translateX(-50%) translateY(12px) rotate(-6deg) scale(.9); } }
+@keyframes coller-postit { from { opacity: 0; transform: translate(-50%, -46%) rotate(-7deg) scale(1.08); } }
+.carnet__article--leve { animation: soulever .18s ease-out; }
+@keyframes soulever { from { box-shadow: 0 0 0 rgba(35, 50, 74, 0); } }
+.carnet__stylo { transition: transform .15s ease; }
+.carnet__stylo[hidden] { display: none; }
+.carnet__stylo:active { transform: scale(.92) rotate(-8deg); }
+@media (prefers-reduced-motion: reduce) {
+  .carnet *, .carnet *::before, .carnet *::after { animation: none !important; transition: none !important; }
+}
+.carnet__question {
+  position: fixed; left: 50%; top: 44%; z-index: 40; width: min(320px, calc(100% - 40px));
+  transform: translate(-50%, -50%) rotate(-1.5deg); background: #FFF7B8; color: var(--encre);
+  padding: 16px 16px 12px; box-shadow: 2px 4px 0 rgba(35, 50, 74, .22), 0 18px 40px rgba(35, 50, 74, .18);
+}
+.carnet__question[hidden] { display: none; }
+.carnet__question p { margin: 0 0 12px; font-size: 26px; line-height: 1.15; }
+.carnet__question .carnet__question-nom { font-weight: 700; font-size: 28px; }
+/* Le nom se corrige sur le post-it même, souligné en pointillé ; le compteur à sa droite. */
+.carnet input { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }
+.carnet__edition { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.carnet__edition-nom {
+  flex: 1; min-width: 0; font-family: Caveat, cursive; font-weight: 700; font-size: 28px; line-height: 1.15;
+  color: var(--encre); background: none; border: 0; border-bottom: 1.5px dashed rgba(35, 50, 74, .35);
+  padding: 0 0 2px; outline: none; border-radius: 0;
+}
+.carnet__edition-nom:focus { border-bottom-color: var(--rouge); }
+.carnet__compteur { flex: none; display: flex; align-items: center; gap: 2px; font-family: Caveat, cursive; }
+.carnet__compteur span { min-width: 36px; text-align: center; font-size: 26px; color: var(--rouge); }
+.carnet__compteur button {
+  width: 34px; height: 34px; font-family: Caveat, cursive; font-size: 26px; line-height: 1; cursor: pointer;
+  background: none; color: var(--encre); border: 1.5px solid var(--encre); border-radius: 48% 52% 45% 55%;
+}
+.carnet__compteur[hidden] { display: none; }
+.carnet__compteur button:disabled { opacity: .3; cursor: default; }
+.carnet__rayons { display: flex; flex-wrap: wrap; gap: 4px 6px; margin-bottom: 10px; }
+.carnet__rayons button {
+  font-family: Caveat, cursive; font-size: 21px; line-height: 1.2; padding: 3px 8px; cursor: pointer;
+  background: none; border: 0; border-radius: 40% 45% 42% 48%; color: var(--encre);
+}
+/* Le rayon actuel est entouré au feutre. */
+.carnet__rayons button[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--rouge); color: var(--rouge); }
+.carnet__rayons .carnet__nouveau { color: var(--gris); }
+/* Un nom de liste peut être long : il passe à la ligne plutôt que de sortir du post-it. */
+.carnet__listes button { max-width: 100%; overflow-wrap: anywhere; text-align: left; }
+.carnet__nouveau-champ--liste { width: 100%; }
+.carnet__listes-message { min-height: 18px; color: var(--rouge) !important; }
+.carnet__nouveau-champ {
+  width: 140px; font-family: Caveat, cursive; font-size: 21px; line-height: 1.2; padding: 3px 4px; color: var(--encre);
+  background: none; border: 0; border-bottom: 1.5px dashed var(--rouge); outline: none; border-radius: 0;
+}
+.carnet__question-actions { display: flex; justify-content: flex-end; gap: 18px; }
+.carnet__question-actions button {
+  font-family: 'Courier Prime', monospace; font-size: 15px; background: none; border: 0; padding: 6px 0;
+  color: var(--gris); cursor: pointer;
+}
+.carnet__question-actions [data-oui], .carnet__question-actions [data-rayer] {
+  color: var(--rouge); text-decoration: underline; text-underline-offset: 3px;
+}
+
+/* Glisser : l'article soulevé suit le doigt, un trait rouge montre où il tombera. */
+.carnet__article { position: relative; -webkit-touch-callout: none; } /* repère du gribouillis */
+.carnet__article--leve {
+  position: relative; z-index: 20; background: var(--papier);
+  transform: translateY(var(--dy, 0)) rotate(-1.5deg) scale(1.04);
+  box-shadow: 0 10px 22px rgba(35, 50, 74, .25), 0 2px 0 rgba(35, 50, 74, .12);
+  transition: box-shadow .15s ease;
+}
+.carnet__repere { position: relative; height: 0; }
+.carnet__repere::after {
+  content: ''; position: absolute; left: -10px; right: 8px; top: -2px; height: 3px;
+  background: var(--rouge); border-radius: 2px; transform: rotate(-.6deg);
+}

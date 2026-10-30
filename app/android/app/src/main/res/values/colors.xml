@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Le papier du Carnet, derrière l'interface Flutter (évite un éclair au démarrage). -->
+    <color name="fond_jeu">#F7F1E3</color>
+</resources>

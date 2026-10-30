@@ -1,0 +1,151 @@
+/* Présentation du premier lancement. Tout tombe sur les lignes du papier : chaque bloc fait
+   40 px de haut, ou un multiple, à partir de --haut + 40 px. */
+.accueil { overflow: hidden; touch-action: pan-y; user-select: none; }
+.accueil__passer {
+  position: absolute; z-index: 3; top: calc(var(--safe-top) + 6px); right: calc(20px + var(--safe-right));
+}
+.accueil--fin .accueil__passer { visibility: hidden; }
+
+.accueil__pages { position: absolute; inset: 0; }
+.accueil__page {
+  position: absolute; inset: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none;
+  padding: calc(var(--haut) + 40px) calc(24px + var(--safe-right)) calc(140px + var(--safe-bottom)) calc(68px + var(--safe-left));
+  background: inherit; background-image: inherit; background-position: inherit;
+  transform-origin: 0 50%;
+  transform: translateX(12%); opacity: 0; visibility: hidden;
+  transition: transform .6s cubic-bezier(.2, .75, .25, 1), opacity .45s ease, visibility 0s .6s;
+}
+.accueil__page--active {
+  transform: none; opacity: 1; visibility: visible;
+  transition: transform .6s cubic-bezier(.2, .75, .25, 1), opacity .45s ease .05s, visibility 0s;
+}
+/* La page tournée part vers la gauche en pivotant sur la reliure, avec l'ombre d'une feuille. */
+.accueil__page--tournee {
+  transform: translateX(-104%) rotate(-5deg); opacity: 1;
+  box-shadow: 18px 0 30px rgba(35, 50, 74, .18);
+}
+
+/* Page 1 : la liste raturée, puis le nom. */
+.accueil__ratures { list-style: none; margin: 0; padding: 0; }
+.accueil__ratures li { height: 40px; line-height: 40px; font-size: 29px; color: var(--gris); }
+.accueil__ratures li:nth-child(2) { padding-left: 14px; }
+.accueil__ratures li:nth-child(3) { padding-left: 4px; }
+.accueil__ratures li:last-child { color: var(--encre); font-weight: 700; padding-left: 22px; }
+.accueil__page--active .rayure path { animation: trait .42s cubic-bezier(.6, .1, .4, 1) forwards; animation-delay: var(--d, .3s); }
+.accueil__ratures li:last-child .rayure path { animation-duration: .7s; }
+@keyframes trait { to { stroke-dashoffset: 0; } }
+
+.accueil__nom {
+  position: relative; margin: 0; height: 120px; line-height: 128px; font-size: 104px; font-weight: 700;
+  letter-spacing: -.01em; transform: rotate(-3deg); transform-origin: 0 70%;
+  clip-path: inset(0 100% 0 0);
+}
+.accueil__page--active .accueil__nom { animation: ecrire 1s cubic-bezier(.5, 0, .3, 1) 2.2s forwards; }
+.accueil__souligne {
+  position: absolute; left: 2px; bottom: 6px; width: 76%; height: 14px; overflow: visible;
+}
+.accueil__souligne path {
+  fill: none; stroke: var(--rouge); stroke-width: 3.5; stroke-linecap: round; vector-effect: non-scaling-stroke;
+  stroke-dasharray: 1; stroke-dashoffset: 1;
+}
+.accueil__page--active .accueil__souligne path { animation: trait .5s ease-out 3.1s forwards; }
+@keyframes ecrire { to { clip-path: inset(0 -10% 0 0); } }
+
+.accueil__texte { margin: 0; font-size: 25px; line-height: 40px; }
+.accueil__page[data-page="0"] .accueil__texte,
+.accueil__page[data-page="0"] .accueil__tampon { opacity: 0; }
+.accueil__page--active[data-page="0"] .accueil__texte { animation: paraitre .6s ease 2.9s forwards; }
+.accueil__page--active[data-page="0"] .accueil__tampon { animation: tamponner .35s cubic-bezier(.3, 1.6, .5, 1) 3.5s forwards; }
+@keyframes paraitre { to { opacity: 1; } }
+
+.accueil__tampon { margin: 20px 0 0; height: 60px; display: flex; align-items: center; }
+.accueil__tampon span {
+  font-family: 'Courier Prime', monospace; font-size: 12.5px; line-height: 1.3; text-transform: uppercase; letter-spacing: .06em;
+  color: var(--rouge); border: 2px solid currentColor; border-radius: 4px; padding: 6px 10px;
+  transform: rotate(-4deg); display: inline-block;
+}
+@keyframes tamponner {
+  from { opacity: 0; transform: scale(1.6) rotate(-8deg); }
+  to { opacity: .92; transform: none; }
+}
+
+/* Page 2 : trois articles qui s'écrivent tout seuls. */
+.accueil__titre {
+  margin: 0; min-height: 80px; line-height: 80px; font-size: clamp(40px, 12.6vw, 54px); font-weight: 700; transform: rotate(-1.5deg);
+  transform-origin: 0 50%;
+}
+.accueil__exemple { margin: 0 0 40px; }
+.accueil__ligne {
+  height: 40px; line-height: 40px; font-size: 27px; display: flex; align-items: center; gap: 12px; white-space: nowrap;
+}
+.accueil__ligne--autre { color: var(--autre); }
+.accueil__ligne--fait { color: var(--gris); }
+.accueil__case {
+  flex: none; width: 18px; height: 18px; border: 2px solid currentColor; border-radius: 3px; position: relative;
+}
+.accueil__ligne--fait .accueil__case { border-color: var(--encre); }
+.accueil__case svg { position: absolute; left: -3px; top: -9px; width: 26px; height: 26px; overflow: visible; }
+.accueil__case path {
+  fill: none; stroke: var(--vert); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;
+  stroke-dasharray: 1; stroke-dashoffset: 1;
+}
+.accueil__ecrit { clip-path: inset(0 100% 0 0); padding-right: 6px; }
+.accueil__par { opacity: 0; }
+.accueil__par { font-size: 20px; }
+.accueil__page--active .accueil__ecrit { animation: ecrire .7s steps(14) var(--d) forwards; }
+.accueil__page--active .accueil__par { animation: paraitre .3s ease calc(var(--d) + .7s) forwards; }
+.accueil__page--active .accueil__case path { animation: trait .3s ease-out calc(var(--d) + 1s) forwards; }
+.accueil__page--active .accueil__ligne--fait .rayure path { animation: trait .35s ease-out calc(var(--d) + 1.3s) forwards; }
+
+/* Page 3 : la connexion. Les champs s'écrivent sur les lignes du papier. */
+.accueil__form { display: flex; flex-direction: column; margin-top: 0; }
+.accueil__form label { min-height: 40px; line-height: 18px; padding: 16px 0 6px; display: block; }
+.accueil__form input {
+  height: 40px; line-height: 40px; font-family: Caveat, cursive; font-size: 29px; color: var(--encre);
+  background: none; border: 0; padding: 0; outline: none; width: 100%;
+}
+.accueil__form input::placeholder { color: var(--pale); opacity: 1; }
+.accueil__form input:focus { background: linear-gradient(transparent 36px, var(--encre) 36px 38px, transparent 38px); }
+.accueil__erreur { margin: 0; min-height: 40px; line-height: 20px; padding-top: 10px; font-size: 22px; color: var(--rouge); }
+.accueil__erreur[hidden] { display: none; }
+.accueil__connecter {
+  align-self: flex-start; margin-top: 30px; height: 50px; padding: 0 26px; font-family: Caveat, cursive; font-size: 28px; font-weight: 700;
+  color: var(--papier); background: var(--encre); border: 0; border-radius: 3px 6px 4px 5px; cursor: pointer;
+  transform: rotate(-1.5deg); box-shadow: 2px 3px 0 rgba(35, 50, 74, .25);
+}
+.accueil__connecter:active { transform: rotate(-1.5deg) translate(1px, 2px); box-shadow: 0 1px 0 rgba(35, 50, 74, .25); }
+.accueil__connecter:disabled { opacity: .55; }
+.accueil__demo { align-self: flex-start; margin-top: 18px; text-align: left; }
+
+/* Pied : numéro de page et coin corné. */
+.accueil__numero {
+  position: absolute; left: calc(68px + var(--safe-left)); bottom: calc(22px + var(--safe-bottom)); pointer-events: none;
+}
+.accueil__coin {
+  position: absolute; right: 0; bottom: 0; z-index: 3; display: flex; align-items: flex-end; gap: 10px;
+  background: none; border: 0; padding: 0; cursor: pointer; color: var(--encre);
+}
+.accueil--fin .accueil__coin, .accueil--fin .accueil__numero { visibility: hidden; }
+.accueil__coin-texte {
+  font-size: 24px; margin-bottom: calc(18px + var(--safe-bottom)); transform: rotate(-2deg);
+}
+.accueil__coin-pli {
+  width: calc(78px + var(--safe-right)); height: calc(78px + var(--safe-bottom));
+  background: linear-gradient(135deg, #E6DCC5 0 48%, rgba(35, 50, 74, .22) 49%, transparent 51%);
+  filter: drop-shadow(-3px -3px 4px rgba(35, 50, 74, .16));
+  transition: width .25s ease, height .25s ease;
+  animation: frisson 3.2s ease-in-out 4.2s infinite;
+}
+.accueil__coin:active .accueil__coin-pli { width: calc(110px + var(--safe-right)); height: calc(110px + var(--safe-bottom)); }
+@keyframes frisson {
+  0%, 82%, 100% { transform: none; }
+  88% { transform: translate(-3px, -3px); }
+  94% { transform: none; }
+}
+
+@media (max-height: 760px) {
+  .accueil__texte { font-size: 23px; }
+}
+@media (max-height: 700px) {
+  .accueil__nom { height: 80px; line-height: 88px; font-size: 76px; }
+}

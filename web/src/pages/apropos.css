@@ -1,0 +1,100 @@
+/* Page « À propos », sur le papier du Carnet. Blocs de 40 px, comme la liste. */
+.apropos { overflow-y: auto; overscroll-behavior: contain; animation: apropos-entree .35s cubic-bezier(.2, .75, .25, 1); }
+@keyframes apropos-entree { from { transform: translateY(24px); opacity: 0; } }
+.apropos__page {
+  position: relative; max-width: 560px;
+  padding: calc(var(--haut) + 40px) calc(24px + var(--safe-right)) calc(60px + var(--safe-bottom)) calc(68px + var(--safe-left));
+}
+.apropos__retour { position: absolute; top: calc(var(--safe-top) + 6px); left: calc(66px + var(--safe-left)); }
+/* La fiche d'identité de l'app, scotchée en haut de la page. */
+.apropos__carte {
+  position: relative; display: flex; align-items: center; gap: 14px; margin: 18px 0 30px -6px; padding: 14px 14px 12px;
+  background: #FFFDF7; transform: rotate(-1.2deg);
+  box-shadow: 1px 2px 0 rgba(35, 50, 74, .1), 0 12px 18px -12px rgba(35, 50, 74, .45);
+}
+.apropos__scotch {
+  position: absolute; top: -11px; left: 50%; width: 84px; height: 22px; transform: translateX(-50%) rotate(-4deg);
+  background: rgba(214, 196, 150, .75);
+}
+.apropos__scotch--coin { top: -9px; left: auto; right: -14px; width: 64px; transform: rotate(38deg); }
+.apropos__icone {
+  flex: none; width: 64px; height: 64px; border-radius: 14px; box-shadow: 0 0 0 1px rgba(35, 50, 74, .12);
+}
+.apropos__nom { margin: 0; font-size: 44px; line-height: 1; font-weight: 700; }
+.apropos__version { margin: 4px 0 0; }
+.apropos__tampon {
+  position: absolute; right: 10px; bottom: -14px; font-family: 'Courier Prime', monospace; font-weight: 700; font-size: 12px;
+  text-transform: uppercase; letter-spacing: .06em; color: var(--rouge); border: 2px solid currentColor; border-radius: 4px;
+  padding: 2px 7px; background: rgba(255, 253, 247, .85); transform: rotate(-6deg);
+}
+
+.apropos__mot { margin: 0; font-size: 25px; line-height: 40px; }
+.apropos__signature {
+  margin: 0 0 40px; height: 40px; line-height: 40px; font-size: 27px; text-align: right; transform: rotate(-2deg); color: var(--rouge);
+  display: flex; align-items: center; justify-content: flex-end; gap: 6px;
+}
+.apropos__coeur { flex: none; }
+.apropos__coeur path { stroke-dasharray: 80; stroke-dashoffset: 80; animation: coeur .9s ease-out .5s forwards; }
+@keyframes coeur { to { stroke-dashoffset: 0; } }
+
+.apropos__rubrique { margin: 0; height: 40px; line-height: 40px; font-size: 22px; color: var(--rouge); font-weight: 700; }
+.apropos__texte { margin: 0; font-size: 23px; line-height: 40px; }
+
+/* Les pourboires : trois post-it posés de travers, qu'on arrache. */
+.apropos__don { position: relative; margin-bottom: 40px; }
+.apropos__postits { display: flex; gap: 10px; padding: 16px 0 6px; margin-left: -40px; } /* collés à cheval sur la marge */
+.apropos__postit {
+  --pente: -2deg; --fond: var(--postit);
+  flex: 1 1 0; min-width: 0; min-height: 92px; display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start;
+  padding: 9px 8px 8px; border: 0; cursor: pointer; text-align: left; color: var(--encre);
+  background: var(--fond); transform: rotate(var(--pente));
+  box-shadow: 1px 2px 0 rgba(35, 50, 74, .14), 0 10px 14px -10px rgba(35, 50, 74, .45);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.apropos__postit--1 { --pente: 1.5deg; --fond: #FFD9CF; }
+.apropos__postit--2 { --pente: -1deg; --fond: #D6ECF2; }
+.apropos__postit:active { transform: rotate(var(--pente)) translateY(3px) scale(.97); box-shadow: 0 1px 0 rgba(35, 50, 74, .14); }
+.apropos__postit:disabled { opacity: .75; }
+.apropos__postit-dessin { color: var(--rouge); line-height: 0; margin-bottom: 2px; }
+.apropos__postits { position: relative; }
+.apropos__bientot {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-8deg); pointer-events: none;
+  font-family: 'Courier Prime', monospace; font-weight: 700; font-size: 22px; text-transform: uppercase; letter-spacing: .1em;
+  color: var(--rouge); border: 3px double currentColor; border-radius: 6px; padding: 2px 12px; background: rgba(247, 241, 227, .7);
+}
+.apropos__postit:disabled { cursor: default; }
+.apropos__postit-nom { font-family: Caveat, cursive; font-size: 20px; line-height: 1.05; hyphens: auto; max-width: 100%; }
+.apropos__postit-prix { font-family: 'Courier Prime', monospace; font-size: 14px; color: var(--gris); }
+.apropos__etat { margin: 0; min-height: 40px; line-height: 40px; }
+.apropos__merci {
+  position: absolute; right: 0; top: 4px; pointer-events: none;
+}
+.apropos__merci[hidden] { display: none; }
+.apropos__merci span {
+  display: inline-block; font-family: 'Courier Prime', monospace; font-weight: 700; font-size: 20px; text-transform: uppercase;
+  letter-spacing: .08em; color: var(--rouge); border: 3px double currentColor; border-radius: 6px; padding: 4px 10px;
+  transform: rotate(8deg); opacity: .85;
+}
+.apropos__merci--frappe span { animation: frapper .4s cubic-bezier(.3, 1.6, .5, 1); }
+@keyframes frapper { from { opacity: 0; transform: scale(2) rotate(18deg); } }
+
+/* Les liens, sur une fiche bristol posée de travers. */
+.apropos__fiche {
+  position: relative; margin: 8px 0 18px -6px; padding: 0 14px 0;
+  background: linear-gradient(transparent 39px, rgba(176, 69, 58, .55) 39px 41px, transparent 41px),
+    repeating-linear-gradient(transparent 0 39px, rgba(191, 208, 220, .7) 39px 40px), #FFFDF7;
+  transform: rotate(.8deg); box-shadow: 1px 2px 0 rgba(35, 50, 74, .1), 0 12px 18px -12px rgba(35, 50, 74, .45);
+}
+.apropos__liens { list-style: none; margin: 0; padding: 0 0 2px; }
+.apropos__liens li { min-height: 40px; }
+.apropos__liens button {
+  line-height: 40px; font-family: Caveat, cursive; font-size: 25px; color: var(--encre);
+  background: none; border: 0; padding: 0; cursor: pointer; text-align: left;
+}
+.apropos__liens button span { font-family: 'Courier Prime', monospace; font-size: 13px; color: var(--gris); }
+.apropos__note { margin: 8px 0 32px; line-height: 1.55; }
+.apropos__credits { list-style: none; margin: 0 0 24px; padding: 0; line-height: 1.5; }
+.apropos__credits li { padding: 3px 0; }
+.apropos__credits .papier__lien { padding: 0; color: var(--encre); }
+.apropos__copyright { margin: 8px 0 0; }
+.apropos__don { scroll-margin-top: calc(var(--safe-top) + 40px); }

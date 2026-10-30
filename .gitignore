@@ -1,0 +1,26 @@
+# Secrets : clé d'importation Android, mots de passe, jetons Home Assistant. Jamais versionnés.
+secret/
+secrets/
+key.properties
+*.jks
+*.keystore
+.env
+.env.*
+
+# Web
+node_modules/
+dist/
+
+# Coquille Flutter : voir aussi app/.gitignore
+app/assets/app.html
+
+# Divers
+.DS_Store
+Thumbs.db
+*.log
+# Journaux de l’outil Playwright.
+.playwright-mcp/
+
+# Notes de travail locales, hors du dépôt public.
+CLAUDE.local.md
+.claude/

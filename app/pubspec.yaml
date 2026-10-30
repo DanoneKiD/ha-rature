@@ -1,0 +1,58 @@
+name: rature
+description: "Rature : coquille mobile (WebView plein écran) du client des listes Home Assistant."
+publish_to: 'none'
+# Version affichée sur les stores (x.y.z) et numéro de build (+n).
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.13.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  # Écran de démarrage gardé jusqu'au chargement de la page (FlutterNativeSplash.preserve).
+  flutter_native_splash: ^2.4.8
+  flutter_secure_storage: ^11.2.0
+  in_app_purchase: ^3.3.1
+  # Consommer un pourboire retrouvé après coup (pourboires.dart).
+  in_app_purchase_android: ^0.5.5
+  shared_preferences: ^2.5.5
+  url_launcher: ^6.3.3
+  webview_flutter: ^4.14.1
+  # Réglages propres à Android : débogage de la WebView en debug, contenu mixte (ws:// vers HA).
+  webview_flutter_android: ^4.14.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
+
+flutter:
+  uses-material-design: true
+
+  # flutter_native_splash a cassé la build iOS sous
+  # Swift Package Manager (2.4.4), la chaîne Codemagic tourne sous CocoaPods.
+  config:
+    enable-swift-package-manager: false
+  # L'interface web, un seul fichier HTML copié par `npm run app` (non versionné).
+  assets:
+    - assets/app.html
+
+# Icône et écran de démarrage : dessinés par branding/dessiner.js (papier du Carnet, R souligné).
+# Après un nouveau dessin : dart run flutter_launcher_icons && dart run flutter_native_splash:create
+# ⚠️ flutter_native_splash retire android:screenOrientation="portrait" du manifeste : le remettre.
+flutter_launcher_icons:
+  android: "ic_launcher"
+  ios: true
+  remove_alpha_ios: true
+  image_path: "branding/icone.png"
+  adaptive_icon_background: "branding/icone_fond.png"
+  adaptive_icon_foreground: "branding/icone_avant.png"
+
+flutter_native_splash:
+  color: "#F7F1E3"
+  image: "branding/demarrage.png"
+  android_12:
+    color: "#F7F1E3"
+    image: "branding/demarrage_android12.png"

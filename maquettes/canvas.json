@@ -1,0 +1,12 @@
+{"v":3,"createdOnFiles":{"v":1,"at":"2026-10-25T22:10:00Z"},"title":"Listes HA, maquette mobile","launch":{"view":"canvas"},"pages":[],"boards":{
+"Main.dc.html":{"x":0,"y":0,"w":390,"h":844,"title":"1. Android natif (Material 3)","radius":28},
+"Carnet.dc.html":{"x":470,"y":0,"w":390,"h":844,"title":"2. Carnet de courses","radius":28},
+"Things.dc.html":{"x":940,"y":0,"w":390,"h":844,"title":"3. Façon Things","radius":28},
+"Ticket.dc.html":{"x":1410,"y":0,"w":390,"h":844,"title":"4. Ticket de caisse","radius":28},
+"Rayons.dc.html":{"x":1880,"y":0,"w":390,"h":844,"title":"5. Panneaux de rayons","radius":28},
+"Frigo.dc.html":{"x":0,"y":964,"w":390,"h":844,"title":"6. Porte du frigo","radius":28},
+"Suisse.dc.html":{"x":470,"y":964,"w":390,"h":844,"title":"7. Graphisme suisse","radius":28},
+"Brutal.dc.html":{"x":940,"y":964,"w":390,"h":844,"title":"8. Néo-brutaliste","radius":28},
+"Ardoise.dc.html":{"x":1410,"y":964,"w":390,"h":844,"title":"9. Ardoise du marché","radius":28},
+"Matrice.dc.html":{"x":1880,"y":964,"w":390,"h":844,"title":"10. Matrice de points","radius":28}},
+"order":["Main.dc.html","Carnet.dc.html","Things.dc.html","Ticket.dc.html","Rayons.dc.html","Frigo.dc.html","Suisse.dc.html","Brutal.dc.html","Ardoise.dc.html","Matrice.dc.html"],"notes":{},"designSystems":[]}

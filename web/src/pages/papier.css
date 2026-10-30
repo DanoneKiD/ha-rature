@@ -1,0 +1,51 @@
+/* Le papier du Carnet, partagé par les pages hors liste (accueil, à propos) : lignes tous les
+   40 px, marge rouge, écriture Caveat, notes tapées en Courier Prime. Mêmes couleurs que
+   skins/carnet/carnet.css. Polices : importées par le Carnet, déjà dans le fichier unique. */
+.papier {
+  --papier: #F7F1E3;
+  --ligne: #BFD0DC;
+  --marge: #E2A0A0;
+  --encre: #23324A;
+  --gris: #6A7385;
+  --pale: #9AA3B2;
+  --rouge: #B0453A;
+  --autre: #7A3E8F;
+  --vert: #2E7D4F;
+  --postit: #FFF7B8;
+  --haut: calc(var(--safe-top) + 10px);
+
+  position: fixed; inset: 0; z-index: 60;
+  /* Marge rouge et lignes dans le même fond, attaché au contenu : ils défilent avec lui. */
+  background-color: var(--papier);
+  background-image:
+    linear-gradient(90deg, transparent 52px, var(--marge) 52px 54px, transparent 54px),
+    repeating-linear-gradient(var(--papier) 0 39px, var(--ligne) 39px 40px);
+  background-position: 0 0, 0 var(--haut);
+  background-attachment: local;
+  color: var(--encre);
+  font-family: Caveat, cursive;
+}
+.papier__tape {
+  font-family: 'Courier Prime', monospace; font-size: 13px; color: var(--gris); letter-spacing: .01em;
+}
+.papier__lien {
+  font-family: 'Courier Prime', monospace; font-size: 13px; color: var(--gris);
+  background: none; border: 0; padding: 8px 0; cursor: pointer;
+  text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px;
+}
+
+/* Un trait de feutre qui barre un mot : <span class="rayure">mot<svg>…</svg></span>. */
+.rayure { position: relative; display: inline-block; }
+.rayure svg {
+  position: absolute; left: -6%; top: 50%; width: 112%; height: 22px; margin-top: -9px; overflow: visible;
+  pointer-events: none;
+}
+.rayure path {
+  fill: none; stroke: var(--encre); stroke-width: 3; stroke-linecap: round; vector-effect: non-scaling-stroke;
+  stroke-dasharray: 1; stroke-dashoffset: 1;
+}
+.rayure--rouge path { stroke: var(--rouge); stroke-width: 4; }
+
+@media (prefers-reduced-motion: reduce) {
+  .papier *, .papier *::before, .papier *::after { animation-duration: 1ms !important; animation-delay: 0ms !important; transition-duration: 1ms !important; }
+}
