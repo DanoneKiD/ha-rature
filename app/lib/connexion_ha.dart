@@ -53,11 +53,11 @@ class ConnexionHA {
     throw ErreurHA('injoignable', 'Aucun Home Assistant ne répond à cette adresse.');
   }
 
-  /// IP privée, `localhost`, nom en `.local` ou sans point (`homeassistant:8123`).
+  /// IP privée, `localhost`, nom de réseau local (`.local`, `.lan`...) ou sans point (`homeassistant:8123`).
   static bool _adresseLocale(String s) {
     final hote = s.split('/').first.split(':').first.toLowerCase();
     return !hote.contains('.') ||
-        hote.endsWith('.local') ||
+        RegExp(r'\.(local|lan|home|internal|localdomain|home\.arpa|fritz\.box)$').hasMatch(hote) ||
         RegExp(r'^(127\.|10\.|192\.168\.|169\.254\.|172\.(1[6-9]|2\d|3[01])\.)').hasMatch(hote);
   }
 

@@ -103,7 +103,7 @@ export const TEXTES = {
     'skin.carnet': 'Carnet de courses',
 
     'erreur.adresse': 'Indiquez l’adresse de Home Assistant.',
-    'erreur.injoignable': 'Aucun Home Assistant ne répond à cette adresse.',
+    'erreur.injoignable': 'Aucun Home Assistant ne répond à cette adresse. Essayez l’adresse complète, avec http:// ou https://.',
     'erreur.deconnecte': 'Home Assistant a refusé la connexion. Reconnectez-vous.',
     'erreur.reseau': 'Home Assistant ne répond pas. Vérifiez le réseau.',
     'erreur.interne': 'Quelque chose s’est mal passé : {message}',
@@ -256,7 +256,7 @@ export const TEXTES = {
     'skin.carnet': 'Shopping notebook',
 
     'erreur.adresse': 'Enter your Home Assistant address.',
-    'erreur.injoignable': 'No Home Assistant answers at this address.',
+    'erreur.injoignable': 'No Home Assistant answers at this address. Try the full address, with http:// or https://.',
     'erreur.deconnecte': 'Home Assistant refused the connection. Please sign in again.',
     'erreur.reseau': 'Home Assistant is not answering. Check the network.',
     'erreur.interne': 'Something went wrong: {message}',
@@ -409,7 +409,7 @@ export const TEXTES = {
     'skin.carnet': 'Einkaufsheft',
 
     'erreur.adresse': 'Gib die Adresse von Home Assistant ein.',
-    'erreur.injoignable': 'Unter dieser Adresse antwortet kein Home Assistant.',
+    'erreur.injoignable': 'Unter dieser Adresse antwortet kein Home Assistant. Versuche die vollständige Adresse mit http:// oder https://.',
     'erreur.deconnecte': 'Home Assistant hat die Verbindung abgelehnt. Bitte melde dich erneut an.',
     'erreur.reseau': 'Home Assistant antwortet nicht. Prüfe das Netzwerk.',
     'erreur.interne': 'Etwas ist schiefgelaufen: {message}',

@@ -8,6 +8,8 @@
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; }
+/* Une app, pas une page : ni pincement ni double appui pour zoomer. */
+html { touch-action: pan-x pan-y; }
 body {
   overscroll-behavior: none; -webkit-tap-highlight-color: transparent;
   /* Une app, pas une page : l'appui long ne sélectionne pas le texte (Android proposait « Copier »). */

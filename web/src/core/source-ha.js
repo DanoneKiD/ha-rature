@@ -27,7 +27,7 @@ import {
   getAuth,
   getStates,
 } from 'home-assistant-js-websocket';
-import { dansCoquille, erreur, natif } from './coquille.js';
+import { dansCoquille, erreur, installerPontSocket, natif } from './coquille.js';
 
 const DESCRIPTION = 64;
 const DEPLACER = 8;
@@ -44,6 +44,7 @@ export function creerSourceHA(reglages) {
     onRefus: null,
 
     async demarrer() {
+      if (dansCoquille()) installerPontSocket();
       const auth = dansCoquille()
         ? authCoquille(reglages.url)
         : await getAuth({ hassUrl: reglages.url, saveTokens, loadTokens });

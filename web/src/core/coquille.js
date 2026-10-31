@@ -14,6 +14,8 @@ export function brancherCoquille(store) {
   if (premier) {
     document.addEventListener('visibilitychange', () => (document.hidden ? courant.pause() : courant.reprise()));
     document.addEventListener('keydown', (e) => e.key === 'Escape' && retour());
+    // WKWebView ignore `user-scalable=no` : le pincement s'arrête ici.
+    document.addEventListener('gesturestart', (e) => e.preventDefault());
   }
 }
 
@@ -57,6 +59,61 @@ export const dansCoquille = () => !!window.__coquille?.native;
  */
 let numero = 0;
 const attentes = new Map();
+/**
+ * Dans la coquille, un `ws://` passe par Dart (app/lib/pont_socket.dart) : la page, servie en https,
+ * n'a pas le droit de l'ouvrir elle-même. La bibliothèque de HA fait `new WebSocket(url)` et n'en
+ * utilise que les événements, `send`, `close`, `readyState` et les constantes d'état.
+ */
+export function installerPontSocket() {
+  if (window.__socket) return;
+  const Reel = window.WebSocket;
+  const ouverts = new Map();
+  let suivant = 0;
+  class SocketNatif extends EventTarget {
+    static CONNECTING = 0;
+    static OPEN = 1;
+    static CLOSING = 2;
+    static CLOSED = 3;
+    CONNECTING = 0;
+    OPEN = 1;
+    CLOSING = 2;
+    CLOSED = 3;
+    readyState = 0;
+    constructor(url) {
+      super();
+      this.url = url;
+      this.n = ++suivant;
+      ouverts.set(this.n, this);
+      natif('socketOuvrir', { n: this.n, url }).catch(() => window.__socket(this.n, 'close'));
+    }
+    send(texte) {
+      natif('socketEnvoyer', { n: this.n, texte }).catch(() => {});
+    }
+    close() {
+      if (this.readyState >= 2) return;
+      this.readyState = 2;
+      natif('socketFermer', { n: this.n }).catch(() => {});
+    }
+  }
+  window.__socket = (n, type, texte) => {
+    const s = ouverts.get(n);
+    if (!s) return;
+    if (type === 'open') {
+      s.readyState = 1;
+      s.dispatchEvent(new Event('open'));
+    } else if (type === 'message') {
+      s.dispatchEvent(new MessageEvent('message', { data: texte }));
+    } else {
+      ouverts.delete(n);
+      s.readyState = 3;
+      s.dispatchEvent(new CloseEvent('close'));
+    }
+  };
+  window.WebSocket = new Proxy(Reel, {
+    construct: (R, [url, ...reste]) => (String(url).startsWith('ws://') ? new SocketNatif(url) : new R(url, ...reste)),
+  });
+}
+
 export function natif(action, donnees = {}) {
   window.__natif ??= {
     repondre(id, e, valeur) {

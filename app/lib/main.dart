@@ -12,6 +12,7 @@ import 'package:webview_flutter_android/webview_flutter_android.dart';
 
 import 'app_config.dart';
 import 'connexion_ha.dart';
+import 'pont_socket.dart';
 import 'pourboires.dart';
 
 /// Coquille mobile : une WebView plein écran qui affiche l'interface web, fichier HTML unique embarqué.
@@ -53,6 +54,9 @@ class _EcranAppState extends State<EcranApp> with WidgetsBindingObserver {
   late final WebViewController _web;
   late final SharedPreferences _prefs;
   final _ha = ConnexionHA();
+  late final _sockets = PontSocket((n, type, [texte]) {
+    _web.runJavaScript('window.__socket && __socket(${jsonEncode(n)}, ${jsonEncode(type)}, ${jsonEncode(texte)})');
+  });
   bool _pret = false;
   bool _charge = false;
   String _marges = '';
@@ -92,6 +96,7 @@ class _EcranAppState extends State<EcranApp> with WidgetsBindingObserver {
     _web = WebViewController.fromPlatformCreationParams(params)
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(appFond)
+      ..enableZoom(false)
       ..addJavaScriptChannel('NativeStore', onMessageReceived: _memoriser)
       ..addJavaScriptChannel('RatureNatif', onMessageReceived: _natif)
       ..setNavigationDelegate(NavigationDelegate(
@@ -112,9 +117,6 @@ class _EcranAppState extends State<EcranApp> with WidgetsBindingObserver {
     if (android is AndroidWebViewController) {
       // Débogage par chrome://inspect, seulement dans les versions debug.
       await AndroidWebViewController.enableDebugging(kDebugMode);
-      // La page vient de https://rature.local/ et Home Assistant répond souvent en ws:// sur le
-      // réseau local : sans ce réglage, la WebView bloque ce contenu mixte.
-      await android.setMixedContentMode(MixedContentMode.compatibilityMode);
     }
     // Filet de sécurité : ne jamais rester bloqué sur l'écran de démarrage.
     Future.delayed(const Duration(seconds: 20), FlutterNativeSplash.remove);
@@ -197,6 +199,12 @@ class _EcranAppState extends State<EcranApp> with WidgetsBindingObserver {
           await _ha.creerListe(msg['nom'] as String? ?? '');
         case 'deconnecter':
           await _ha.deconnecter();
+        case 'socketOuvrir':
+          unawaited(_sockets.ouvrir(msg['n'] as int, msg['url'] as String));
+        case 'socketEnvoyer':
+          _sockets.envoyer(msg['n'] as int, msg['texte'] as String);
+        case 'socketFermer':
+          await _sockets.fermer(msg['n'] as int);
         case 'ouvrir':
           final uri = Uri.parse(msg['url'] as String);
           if (!const {'https', 'http', 'mailto'}.contains(uri.scheme)) throw ErreurHA('interne', 'Lien refusé');

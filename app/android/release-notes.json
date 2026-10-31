@@ -1,5 +1,5 @@
 [
-  {"language": "fr-FR", "text": "Première version de Rature : la liste de courses de votre Home Assistant, écrite sur un carnet. Connexion avec votre compte Home Assistant, sans clé à copier. Les ajouts à la voix apparaissent tout seuls, les articles se rangent par rayon, et tout marche hors ligne au magasin. Gratuite, sans pub. Essayez-la sans Home Assistant avec le mode démo."},
-  {"language": "en-US", "text": "First release of Rature: your Home Assistant shopping list, written in a paper notepad. Sign in with your Home Assistant account, no key to copy. Items added by voice show up on their own, items sort themselves by aisle, and everything works offline at the store. Free, no ads. Try it without Home Assistant in demo mode."},
-  {"language": "de-DE", "text": "Erste Version von Rature: die Einkaufsliste deines Home Assistant, in einem Notizblock geschrieben. Anmeldung mit deinem Home-Assistant-Konto, ohne Schlüssel zum Kopieren. Per Sprache Hinzugefügtes erscheint von selbst, Artikel ordnen sich nach Abteilung, und im Laden funktioniert alles offline. Kostenlos, ohne Werbung. Ohne Home Assistant im Demomodus ausprobieren."}
+  {"language": "fr-FR", "text": "Corrige la connexion à Home Assistant par une adresse locale en http (IP ou homeassistant.local) : les listes restaient vides. Le zoom par pincement est retiré."},
+  {"language": "en-US", "text": "Fixes connecting to Home Assistant through a local http address (IP or homeassistant.local): lists stayed empty. Pinch zoom is removed."},
+  {"language": "de-DE", "text": "Behebt die Verbindung zu Home Assistant über eine lokale http-Adresse (IP oder homeassistant.local): Listen blieben leer. Der Zoom per Fingergeste entfällt."}
 ]

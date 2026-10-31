@@ -2,7 +2,7 @@ name: rature
 description: "Rature : coquille mobile (WebView plein écran) du client des listes Home Assistant."
 publish_to: 'none'
 # Version affichée sur les stores (x.y.z) et numéro de build (+n).
-version: 1.0.0+1
+version: 1.0.1+2
 
 environment:
   sdk: ^3.13.2
