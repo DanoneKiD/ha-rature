@@ -1,5 +1,5 @@
 [
-  {"language": "fr-FR", "text": "Corrige la connexion à Home Assistant par une adresse locale en http (IP ou homeassistant.local) : les listes restaient vides. Le zoom par pincement est retiré."},
-  {"language": "en-US", "text": "Fixes connecting to Home Assistant through a local http address (IP or homeassistant.local): lists stayed empty. Pinch zoom is removed."},
-  {"language": "de-DE", "text": "Behebt die Verbindung zu Home Assistant über eine lokale http-Adresse (IP oder homeassistant.local): Listen blieben leer. Der Zoom per Fingergeste entfällt."}
+  {"language":"fr-FR","text":"Tirez la liste vers le bas pour l’actualiser. Post-it d’un article : bouton OK et nom plus grand. Corrige un article en double après un renommage, des listes vides quand Home Assistant démarre, et un article perdu lors d’une coupure."},
+  {"language":"en-US","text":"Pull the list down to refresh. Item sticky note: an OK button and a larger name. Fixes a duplicate item after renaming, empty lists while Home Assistant starts, and an item lost when the connection drops."},
+  {"language":"de-DE","text":"Liste nach unten ziehen zum Aktualisieren. Notizzettel eines Artikels: OK-Taste und größerer Name. Behebt doppelte Artikel nach dem Umbenennen, leere Listen beim Start von Home Assistant und einen verlorenen Artikel bei Verbindungsabbruch."}
 ]

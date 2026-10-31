@@ -66,6 +66,7 @@ export function monter(racine, store, { ouvrirReglages, ouvrirPourboires } = {})
     <div class="carnet">
       <div class="carnet__marge"></div>
       <div class="carnet__scotch"></div>
+      <div class="carnet__tirer" data-tirer hidden><span class="carnet__plume" role="img" aria-label="${t('carnet.connexion')}"><i></i><i></i><i></i></span></div>
       <div class="carnet__page">
         <div class="carnet__tete">
           <button class="carnet__titre" type="button" data-titre>${t('liste.defaut')}</button>
@@ -100,17 +101,19 @@ export function monter(racine, store, { ouvrirReglages, ouvrirPourboires } = {})
   let enRetard = false; // une mise à jour arrivée pendant un glisser, dessinée au lâcher
   let pageTournee = 0; // jusqu'à cet instant, la liste change en entier : pas d'animation ligne à ligne
   const sursis = new Map(); // clé du nom vers l'instant où l'article coché pourra descendre au panier
+  let tire = null; // la page qu'on tire vers le bas pour actualiser
   let dansPanier = 0; // nombre de cochés au dernier dessin (pour faire sautiller le compteur)
+  let dessin = null; // le HTML de la liste au dernier dessin
 
   function dessiner() {
-    if (geste?.leve) {
+    // Un redessin en plein geste retirerait la ligne sous le doigt, et son relâchement avec.
+    if (geste?.leve || tire?.decale) {
       enRetard = true;
       return;
     }
     const { tri, rayons } = store.affichage;
     // En-tête : le tri seul, court, sur une ligne (le regroupement se voit dans la liste).
     $('[data-tri]').setAttribute('aria-label', t('barre.trie', { tri: t(`barre.${tri}`), rayons: t(rayons ? 'barre.rayons' : 'barre.ensemble') }));
-    const avant = photographier();
     $('[data-titre]').textContent = store.liste?.nom ?? t('liste.defaut');
     ajusterTitre();
     // Pas encore connecté : quelques secondes de points qui s'écrivent (démarrage, retour dans
@@ -124,9 +127,9 @@ export function monter(racine, store, { ouvrirReglages, ouvrirPourboires } = {})
     else if (reste > 0) {
       etat.push(`<span class="carnet__plume" role="img" aria-label="${t('carnet.connexion')}"><i></i><i></i><i></i></span>`);
       attenteConnexion = setTimeout(dessiner, reste + 50);
-    } else if (!store.connecte) etat.push(echapper(t('carnet.horsLigne')));
+    } else if (!store.connecte && !store.enAttente) etat.push(echapper(t('carnet.horsLigne'))); // « en attente » le dit déjà, et plus long il couperait le titre
     if (store.enAttente) etat.push(echapper(t('carnet.attente', { n: store.enAttente })));
-    $('[data-etat]').innerHTML = etat.length ? ` · ${etat.join(' · ')}` : '';
+    $('[data-etat]').innerHTML = etat.join(' · ');
 
     articles = store.articles;
     const maintenant = Date.now();
@@ -151,6 +154,10 @@ export function monter(racine, store, { ouvrirReglages, ouvrirPourboires } = {})
       if (ouvert)
         panier += `<div class="carnet__panier-zone">${trier(faits, store.affichage.tri).map((a) => ligne(a, null)).join('')}</div>`;
     }
+    // La liste du cache puis la même reçue de HA, un retour dans l'app... : rien à redessiner.
+    if (html + panier === dessin) return;
+    dessin = html + panier;
+    const avant = photographier();
     liste.innerHTML = html;
     bas.innerHTML = panier;
     animer(avant);
@@ -183,8 +190,9 @@ export function monter(racine, store, { ouvrirReglages, ouvrirPourboires } = {})
   }
 
   function animer(avant) {
-    // Premier remplissage, ou changement de liste : rien à faire glisser ligne à ligne.
-    if (calme() || !avant.size || Date.now() < pageTournee) return;
+    // Changement de liste : la page tourne, rien à faire glisser ligne à ligne.
+    if (calme() || Date.now() < pageTournee) return;
+    if (!avant.size) return remplir();
     for (const el of page.querySelectorAll('[data-cle]')) {
       const v = avant.get(el.dataset.cle);
       if (!v) {
@@ -202,11 +210,26 @@ export function monter(racine, store, { ouvrirReglages, ouvrirPourboires } = {})
     }
   }
 
+  /** Premier remplissage : les lignes visibles s'écrivent de haut en bas, 0,3 s en tout. */
+  function remplir() {
+    const visibles = [...page.querySelectorAll('[data-cle]')].filter((el) => el.getBoundingClientRect().top < innerHeight);
+    const duree = 150;
+    const pas = Math.min(25, (300 - duree) / Math.max(1, visibles.length - 1));
+    visibles.forEach((el, i) => {
+      const temps = { delay: i * pas, duration: duree, easing: DOUX, fill: 'backwards' };
+      ecrireLigne(el, temps, temps);
+    });
+  }
+
+  function ecrireLigne(el, tempsLigne, tempsNom) {
+    el.animate([{ opacity: 0, transform: 'translateY(-6px)' }, { opacity: 1, transform: 'none' }], tempsLigne);
+    el.querySelector('.carnet__nom')?.animate([{ clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0 0 0)' }], tempsNom);
+  }
+
   /** Une ligne nouvelle : le titre de rayon apparaît, l'article s'écrit de gauche à droite. */
   function ecrire(el) {
     if (!el.dataset.uid) return void el.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'ease-out' });
-    el.animate([{ opacity: 0, transform: 'translateY(-6px)' }, { opacity: 1, transform: 'none' }], { duration: 220, easing: DOUX });
-    el.querySelector('.carnet__nom')?.animate([{ clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0 0 0)' }], { duration: 520, easing: 'cubic-bezier(.45, 0, .3, 1)', fill: 'backwards' });
+    ecrireLigne(el, { duration: 220, easing: DOUX }, { duration: 520, easing: 'cubic-bezier(.45, 0, .3, 1)', fill: 'backwards' });
   }
 
   /** Rayer pour de bon : gribouillis rouge, la ligne se referme, puis la suppression part. */
@@ -255,12 +278,25 @@ export function monter(racine, store, { ouvrirReglages, ouvrirPourboires } = {})
   const postit = $('[data-question]');
   const voile = $('[data-voile]');
   let fermerPostit = null;
+  let sourdJusque = 0;
+  page.addEventListener(
+    'click',
+    (e) => {
+      if (Date.now() < sourdJusque && e.target.closest('[data-uid]')) {
+        e.stopPropagation();
+        e.preventDefault();
+      }
+    },
+    true,
+  );
   function montrerPostit(html, surClic, avantFermer) {
     fermerPostit?.();
+    postit.style.pointerEvents = '';
     postit.innerHTML = html;
     postit.hidden = voile.hidden = false;
     const fermer = () => {
       avantFermer?.();
+      sourdJusque = Date.now() + 450; // un double appui ne doit pas cocher l'article dessous
       retirer();
       postit.hidden = voile.hidden = true;
       fermerPostit = null;
@@ -294,7 +330,8 @@ export function monter(racine, store, { ouvrirReglages, ouvrirPourboires } = {})
   }
 
   // Le post-it d'un article : son nom (modifiable sur place), son nombre, son rayon, « Rayer ».
-  // Nom et nombre s'enregistrent à la fermeture (voile, retour, rayon choisi) ; « Annuler » les oublie.
+  // Nom et nombre s'enregistrent à la fermeture (voile, retour, rayon choisi) ; « OK » le montre d'un
+  // coup de surligneur ; « Annuler » les oublie.
   function ouvrirPostit(a) {
     const q = quantite(a.nom);
     let n = nombre(a.nom);
@@ -302,6 +339,10 @@ export function monter(racine, store, { ouvrirReglages, ouvrirPourboires } = {})
     const poids = q.qte && !q.qte.startsWith('×');
     const libelle = poids ? a.nom : q.libelle;
     let annule = false;
+    const articleModifie = () => {
+      const nom = postit.querySelector('[data-nom]')?.value.trim();
+      return nom ? { ...a, nom: avecNombre(nom, n) } : a;
+    };
     montrerPostit(
       `<div class="carnet__edition">
         <input class="carnet__edition-nom" data-nom type="text" enterkeyhint="done" autocomplete="off"
@@ -319,7 +360,7 @@ export function monter(racine, store, { ouvrirReglages, ouvrirPourboires } = {})
         `<button type="button" class="carnet__nouveau" data-nouveau>${t('carnet.nouveauRayon')}</button>`,
       )}
       <div class="carnet__question-actions">
-        <button type="button" data-non>${t('commun.annuler')}</button><button type="button" data-rayer>${t('carnet.rayerOui')}</button>
+        <button type="button" data-non>${t('commun.annuler')}</button><button type="button" data-rayer>${t('carnet.rayerOui')}</button><button type="button" data-ok>${t('commun.ok')}</button>
       </div>`,
       (e, fermer) => {
         const vers = e.target.closest('[data-vers]')?.dataset.vers;
@@ -332,12 +373,16 @@ export function monter(racine, store, { ouvrirReglages, ouvrirPourboires } = {})
           // « + rayon » : le nom tapé crée le rayon et y range l'article.
           enChamp(e.target.closest('[data-nouveau]'), { placeholder: t('carnet.nomRayon') }, (c) => {
             const id = ajouterRayon(c.value);
+            const vise = articleModifie();
             fermer();
-            if (id) changerRayon(a, id);
+            if (id) changerRayon(vise, id);
           });
         } else if (vers) {
+          const vise = articleModifie();
           fermer();
-          changerRayon(a, vers);
+          changerRayon(vise, vers);
+        } else if (e.target.closest('[data-ok]')) {
+          valider();
         } else if (e.target.closest('[data-non]')) {
           annule = true;
           fermer();
@@ -360,8 +405,22 @@ export function monter(racine, store, { ouvrirReglages, ouvrirPourboires } = {})
     );
     postit.querySelector('[data-moins]').disabled = n === 1;
     const champ = postit.querySelector('[data-nom]');
+    const fermerCeluiCi = fermerPostit;
+    function valider() {
+      // « + rayon » en cours de saisie : OK vaut Entrée, le rayon est créé et l'article y va.
+      const nouveau = postit.querySelector('.carnet__nouveau-champ');
+      if (nouveau?.value.trim()) return nouveau.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
+      if (calme()) return fermerCeluiCi();
+      champ.blur();
+      postit.style.pointerEvents = 'none';
+      champ.classList.add('carnet__edition-nom--pris');
+      setTimeout(() => {
+        // Le voile ou le retour ont pu le fermer entre-temps.
+        if (fermerPostit === fermerCeluiCi) fermerCeluiCi();
+      }, 380);
+    }
     champ.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') fermerPostit?.();
+      if (e.key === 'Enter') valider();
     });
   }
 
@@ -445,6 +504,7 @@ export function monter(racine, store, { ouvrirReglages, ouvrirPourboires } = {})
   // pour ouvrir le post-it. Un mouvement avant le délai, c'est un défilement : on laisse faire.
   const DELAI = 450;
   page.addEventListener('pointerdown', (e) => {
+    dessin = null; // le geste peut toucher aux lignes : le prochain dessin doit les refaire
     const b = e.target.closest('[data-uid]');
     if (!b || e.button > 0) return;
     geste = { b, uid: b.dataset.uid, x: e.clientX, y: e.clientY, defile: scrollY, leve: false, bouge: false, id: e.pointerId };
@@ -478,6 +538,59 @@ export function monter(racine, store, { ouvrirReglages, ouvrirPourboires } = {})
     if (geste?.leve) poser(true);
     else annulerGeste();
   });
+  // Tirer la page vers le bas, depuis le haut de la liste, relit la liste chez HA.
+  const SEUIL_TIRER = 50; // px de déplacement de la page
+  const temoin = $('[data-tirer]');
+  let actualisation = false;
+  const relacher = () => {
+    tire = null;
+    page.style.transform = '';
+    if (!actualisation) temoin.hidden = true;
+    if (enRetard) {
+      enRetard = false;
+      dessiner();
+    }
+  };
+  const carnet = $('.carnet');
+  carnet.addEventListener(
+    'touchstart',
+    (e) => {
+      tire = scrollY <= 0 && e.touches.length === 1 && postit.hidden && !actualisation ? { y: e.touches[0].clientY, decale: 0 } : null;
+    },
+    { passive: true },
+  );
+  carnet.addEventListener(
+    'touchmove',
+    (e) => {
+      if (!tire) return;
+      const dy = e.touches[0].clientY - tire.y;
+      // Un autre doigt, un glisser d'article, ou la page qui défile : ce n'est plus un tirer.
+      if (geste?.leve || e.touches.length > 1 || dy < -5) return relacher();
+      if (dy < 10) return;
+      if (e.cancelable) e.preventDefault();
+      tire.decale = Math.min(dy * 0.4, 70);
+      page.style.transform = `translateY(${tire.decale}px)`;
+      temoin.hidden = false;
+      temoin.style.opacity = Math.min(1, tire.decale / SEUIL_TIRER);
+    },
+    { passive: false },
+  );
+  carnet.addEventListener('touchend', () => {
+    if (!tire) return;
+    const pret = tire.decale >= SEUIL_TIRER;
+    if (pret) {
+      actualisation = true;
+      temoin.style.opacity = 1;
+      // Le témoin reste assez longtemps pour se voir, même si HA répond tout de suite.
+      Promise.allSettled([store.actualiser(), new Promise((r) => setTimeout(r, 500))]).then(() => {
+        actualisation = false;
+        temoin.hidden = true;
+      });
+    }
+    relacher();
+  });
+  carnet.addEventListener('touchcancel', relacher);
+
   // Pendant un glisser, le doigt ne doit pas faire défiler la page.
   page.addEventListener('touchmove', (e) => geste?.leve && e.preventDefault(), { passive: false });
   page.addEventListener('contextmenu', (e) => e.target.closest('[data-uid]') && e.preventDefault());

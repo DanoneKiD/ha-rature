@@ -25,6 +25,7 @@ import {
   callService,
   createConnection,
   getAuth,
+  getConfig,
   getStates,
 } from 'home-assistant-js-websocket';
 import { dansCoquille, erreur, installerPontSocket, natif } from './coquille.js';
@@ -60,9 +61,10 @@ export function creerSourceHA(reglages) {
       pret.catch((e) => source.onRefus?.(e));
     },
 
-    /** Les listes `todo.*`, ou null tant que HA n'est pas joignable. */
+    /** Les listes `todo.*`, ou null tant que HA n'est pas joignable ou finit de démarrer (listes pas encore chargées). */
     async listes() {
       if (!conn) return null;
+      if ((await getConfig(conn)).state !== 'RUNNING') return null;
       const etats = await getStates(conn);
       return etats
         .filter((e) => e.entity_id.startsWith('todo.'))
@@ -85,12 +87,14 @@ export function creerSourceHA(reglages) {
      */
     async creerListe(nom) {
       if (!conn) throw erreur('reseau');
-      const avant = new Set((await source.listes()).map((l) => l.entity_id));
+      const deja = await source.listes();
+      if (!deja) throw erreur('reseau');
+      const avant = new Set(deja.map((l) => l.entity_id));
       if (dansCoquille()) await natif('creerListe', { nom });
       else await creerListeREST(reglages.url, conn.options.auth, nom);
       // L'entité arrive un instant après l'entrée de configuration.
       for (let i = 0; i < 60; i++) {
-        const nouvelle = (await source.listes()).find((l) => !avant.has(l.entity_id));
+        const nouvelle = (await source.listes())?.find((l) => !avant.has(l.entity_id));
         if (nouvelle) return nouvelle.entity_id;
         await new Promise((r) => setTimeout(r, 500));
       }
@@ -113,17 +117,25 @@ export function creerSourceHA(reglages) {
       return u?.name || null;
     },
 
-    /** La bibliothèque réabonne d'elle-même après une reconnexion. */
+    /**
+     * Pas de réabonnement par la bibliothèque : sur un HA qui démarre, il échoue en silence et la
+     * liste se fige. Le store se réabonne à chaque reconnexion, une fois les listes chargées.
+     */
     abonner(entityId, cb) {
       let fin = null;
       let annule = false;
+      const coupe = () => (fin = null); // après une coupure, le désabonnement n'a plus de sens
       pret
-        .then((c) => c.subscribeMessage((msg) => cb(msg.items), { type: 'todo/item/subscribe', entity_id: entityId }))
+        .then((c) => {
+          c.addEventListener('disconnected', coupe);
+          return c.subscribeMessage((msg) => annule || cb(msg.items), { type: 'todo/item/subscribe', entity_id: entityId }, { resubscribe: false });
+        })
         .then((f) => (annule ? f() : (fin = f)))
         .catch(() => {});
       return () => {
         annule = true;
-        fin?.();
+        conn?.removeEventListener('disconnected', coupe);
+        Promise.resolve(fin?.()).catch(() => {});
       };
     },
 

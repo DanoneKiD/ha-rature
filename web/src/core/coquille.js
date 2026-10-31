@@ -53,35 +53,22 @@ function retour() {
 /** Vrai dans l'application native (script injecté par la coquille). */
 export const dansCoquille = () => !!window.__coquille?.native;
 
-/**
- * Demande à la coquille (canal RatureNatif, app/lib/main.dart) : `connecter` { url },
- * `acces`, `deconnecter`. Rejette avec une erreur portant `code` (deconnecte, reseau, annule...).
- */
 let numero = 0;
 const attentes = new Map();
 /**
  * Dans la coquille, un `ws://` passe par Dart (app/lib/pont_socket.dart) : la page, servie en https,
  * n'a pas le droit de l'ouvrir elle-même. La bibliothèque de HA fait `new WebSocket(url)` et n'en
- * utilise que les événements, `send`, `close`, `readyState` et les constantes d'état.
+ * utilise que les événements, `send`, `close`, `readyState` et `OPEN`.
  */
 export function installerPontSocket() {
   if (window.__socket) return;
-  const Reel = window.WebSocket;
   const ouverts = new Map();
   let suivant = 0;
   class SocketNatif extends EventTarget {
-    static CONNECTING = 0;
-    static OPEN = 1;
-    static CLOSING = 2;
-    static CLOSED = 3;
-    CONNECTING = 0;
     OPEN = 1;
-    CLOSING = 2;
-    CLOSED = 3;
     readyState = 0;
     constructor(url) {
       super();
-      this.url = url;
       this.n = ++suivant;
       ouverts.set(this.n, this);
       natif('socketOuvrir', { n: this.n, url }).catch(() => window.__socket(this.n, 'close'));
@@ -109,11 +96,15 @@ export function installerPontSocket() {
       s.dispatchEvent(new CloseEvent('close'));
     }
   };
-  window.WebSocket = new Proxy(Reel, {
+  window.WebSocket = new Proxy(window.WebSocket, {
     construct: (R, [url, ...reste]) => (String(url).startsWith('ws://') ? new SocketNatif(url) : new R(url, ...reste)),
   });
 }
 
+/**
+ * Demande à la coquille (canal RatureNatif, app/lib/main.dart) : `connecter` { url },
+ * `acces`, `deconnecter`. Rejette avec une erreur portant `code` (deconnecte, reseau, annule...).
+ */
 export function natif(action, donnees = {}) {
   window.__natif ??= {
     repondre(id, e, valeur) {

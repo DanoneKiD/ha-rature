@@ -10,6 +10,7 @@
   --papier: #F7F1E3;
   --ligne: #BFD0DC;
   --marge: #E2A0A0;
+  --surligneur: linear-gradient(transparent 52%, rgba(255, 226, 64, .75) 52% 88%, transparent 88%) no-repeat 0 0 / 100% 100%;
   --encre: #23324A;
   --gris: #6A7385;
   --pale: #9AA3B2;
@@ -56,9 +57,13 @@
 .carnet__date, .carnet__etat {
   font-family: 'Courier Prime', monospace; color: var(--gris);
 }
-.carnet__date { font-size: 11px; line-height: 20px; }
-.carnet__etat { font-size: 11px; line-height: 20px; color: var(--rouge); }
+.carnet__date { position: relative; font-size: 11px; line-height: 20px; }
+/* Sous les icônes, sans prendre de place : le titre garde sa taille et reste lisible quand l'état change. */
+.carnet__etat { position: absolute; right: 0; top: 52px; font-size: 11px; line-height: 16px; color: var(--rouge); pointer-events: none; }
 .carnet__etat:empty { display: none; }
+/* Tirer pour actualiser : les mêmes points d'encre, en haut de la page. */
+.carnet__tirer { position: absolute; top: calc(var(--safe-top) + 12px); left: 0; right: 0; text-align: center; pointer-events: none; }
+.carnet__tirer[hidden] { display: none; }
 /* Connexion en cours : trois points d'encre qui s'écrivent l'un après l'autre. */
 .carnet__plume { display: inline-flex; gap: 3px; vertical-align: middle; }
 .carnet__plume i {
@@ -105,7 +110,7 @@
 
 /* Doublon : un coup de surligneur sur le nom. */
 .carnet__article--surligne .carnet__nom {
-  background: linear-gradient(transparent 52%, rgba(255, 226, 64, .75) 52% 88%, transparent 88%) no-repeat 0 0 / 100% 100%;
+  background: var(--surligneur);
   animation: surligner .45s ease-out;
 }
 @keyframes surligner { from { background-size: 0 100%; } }
@@ -164,16 +169,21 @@
 .carnet__question[hidden] { display: none; }
 .carnet__question p { margin: 0 0 12px; font-size: 26px; line-height: 1.15; }
 .carnet__question .carnet__question-nom { font-weight: 700; font-size: 28px; }
-/* Le nom se corrige sur le post-it même, souligné en pointillé ; le compteur à sa droite. */
+/* Le nom se corrige sur le post-it même, souligné en pointillé, seul sur sa ligne ; le compteur dessous. */
 .carnet input { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }
-.carnet__edition { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.carnet__edition { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; margin-bottom: 10px; }
 .carnet__edition-nom {
-  flex: 1; min-width: 0; font-family: Caveat, cursive; font-weight: 700; font-size: 28px; line-height: 1.15;
+  width: 100%; font-family: Caveat, cursive; font-weight: 700; font-size: 32px; line-height: 1.15;
   color: var(--encre); background: none; border: 0; border-bottom: 1.5px dashed rgba(35, 50, 74, .35);
   padding: 0 0 2px; outline: none; border-radius: 0;
 }
 .carnet__edition-nom:focus { border-bottom-color: var(--rouge); }
-.carnet__compteur { flex: none; display: flex; align-items: center; gap: 2px; font-family: Caveat, cursive; }
+/* « OK » : le nom pris d'un coup de surligneur, avant que le post-it se ferme. */
+.carnet__edition-nom--pris {
+  background: var(--surligneur);
+  animation: surligner .34s ease-out;
+}
+.carnet__compteur { display: flex; align-items: center; gap: 2px; font-family: Caveat, cursive; }
 .carnet__compteur span { min-width: 36px; text-align: center; font-size: 26px; color: var(--rouge); }
 .carnet__compteur button {
   width: 34px; height: 34px; font-family: Caveat, cursive; font-size: 26px; line-height: 1; cursor: pointer;
@@ -205,6 +215,7 @@
 .carnet__question-actions [data-oui], .carnet__question-actions [data-rayer] {
   color: var(--rouge); text-decoration: underline; text-underline-offset: 3px;
 }
+.carnet__question-actions [data-ok] { color: var(--encre); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
 
 /* Glisser : l'article soulevé suit le doigt, un trait rouge montre où il tombera. */
 .carnet__article { position: relative; -webkit-touch-callout: none; } /* repère du gribouillis */

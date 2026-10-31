@@ -2,7 +2,7 @@ name: rature
 description: "Rature : coquille mobile (WebView plein écran) du client des listes Home Assistant."
 publish_to: 'none'
 # Version affichée sur les stores (x.y.z) et numéro de build (+n).
-version: 1.0.1+2
+version: 1.0.2+3
 
 environment:
   sdk: ^3.13.2
@@ -19,7 +19,7 @@ dependencies:
   shared_preferences: ^2.5.5
   url_launcher: ^6.3.3
   webview_flutter: ^4.14.1
-  # Réglages propres à Android : débogage de la WebView en debug, contenu mixte (ws:// vers HA).
+  # Réglages propres à Android : débogage de la WebView en debug.
   webview_flutter_android: ^4.14.1
 
 dev_dependencies:

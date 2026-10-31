@@ -40,6 +40,7 @@ export function creerStore(source, { moi = null, affichage = {} } = {}) {
   let file = lire(CLE_FILE, []);
   let echos = []; // ajouts envoyés que l'abonnement n'a pas encore renvoyés
   let listesFraiches = false;
+  let reessai = null;
   let finAbonnement = null;
   let vidage = null;
   const abonnes = new Set();
@@ -96,6 +97,8 @@ export function creerStore(source, { moi = null, affichage = {} } = {}) {
 
     async demarrer() {
       source.onEtat = (ok) => {
+        // Après une coupure, HA a pu redémarrer : listes et abonnement sont à refaire.
+        if (!ok) listesFraiches = false;
         if (ok && !listesFraiches) rafraichirListes();
         if (ok && !moi && source.utilisateur) apprendreMoi();
         notifier();
@@ -108,6 +111,11 @@ export function creerStore(source, { moi = null, affichage = {} } = {}) {
       listes = l ?? lire(CLE_LISTES, []);
       if (l) ecrire(CLE_LISTES, l);
       await store.choisir(preferee() ?? listes[0]?.entity_id);
+    },
+
+    /** « Tirer pour actualiser » : relit les listes et se réabonne ; hors ligne, rien à faire. */
+    actualiser() {
+      return source.connecte ? rafraichirListes() : Promise.resolve();
     },
 
     /** Crée une liste dans HA (ou la démo) et l'affiche. Rejette avec un `code` (admin, existe...). */
@@ -246,21 +254,26 @@ export function creerStore(source, { moi = null, affichage = {} } = {}) {
     }
   }
 
-  /** Première connexion après un démarrage hors ligne : les listes ont pu changer. */
+  /** Connexion ou reconnexion : les listes ont pu changer, et l'abonnement est à refaire. */
   async function rafraichirListes() {
     try {
       const l = await source.listes();
-      if (!l) return;
+      if (!l) return reessayer();
       listesFraiches = true;
       listes = l;
       ecrire(CLE_LISTES, l);
       const id = liste?.entity_id;
-      if (id && l.some((x) => x.entity_id === id)) liste = l.find((x) => x.entity_id === id);
-      else await store.choisir(preferee() ?? l[0]?.entity_id);
-      notifier();
+      await store.choisir(id && l.some((x) => x.entity_id === id) ? id : (preferee() ?? l[0]?.entity_id));
     } catch (e) {
       console.warn('Listes illisibles', e);
+      reessayer();
     }
+  }
+
+  /** HA qui démarre, ou lecture ratée : l'abonnement et la file attendent des listes fraîches. */
+  function reessayer() {
+    clearTimeout(reessai);
+    if (source.connecte) reessai = setTimeout(() => !listesFraiches && rafraichirListes(), 3000);
   }
 
   function notifier() {
@@ -268,25 +281,41 @@ export function creerStore(source, { moi = null, affichage = {} } = {}) {
   }
 
   function pousser(op) {
+    suivreEcho(op);
     file.push({ ...op, entity_id: liste.entity_id });
     ecrire(CLE_FILE, file);
     notifier();
     envoyerFile();
   }
 
+  /**
+   * L'article renommé ou supprimé ne doit pas revenir sous son ancien nom par son écho. Renommé alors
+   * que HA ne l'a pas encore renvoyé : seul l'écho le montre, il prend le nouveau nom.
+   */
+  function suivreEcho(op) {
+    if (!op.rename && op.op !== 'supprimer') return;
+    const vise = (e) => cle(e.summary) === cle(op.nom);
+    if (op.rename && !recus.some((i) => vise(i))) echos = echos.map((e) => (vise(e) ? { ...e, summary: op.rename } : e));
+    else echos = echos.filter((e) => !vise(e));
+  }
+
   /** Envoie la file dans l'ordre ; s'arrête à la première erreur réseau et réessaie plus tard. */
   function envoyerFile() {
-    if (vidage || !source.connecte || !file.length) return;
+    // Sur un HA qui démarre, les services manquent encore : l'opération serait abandonnée.
+    if (vidage || !source.connecte || !listesFraiches || !file.length) return;
     vidage = (async () => {
       while (file.length && source.connecte) {
         const op = file[0];
         try {
           await envoyer(op);
-          if (op.op === 'ajouter') echos.push({ ...op, t: Date.now() });
+          // HA a pu renvoyer l'article avant de confirmer l'envoi : pas d'écho alors.
+          if (op.op === 'ajouter' && !recus.some((i) => cle(i.summary) === cle(op.summary))) echos.push({ ...op, t: Date.now() });
+          // Hors ligne, l'ajout et le renommage partent ensemble : l'écho vient d'être créé.
+          suivreEcho(op);
         } catch (e) {
           // Erreur de HA (article disparu, fonction non gérée) : on abandonne l'opération.
           // Erreur de connexion : on garde la file pour plus tard.
-          if (!source.connecte) break;
+          if (!source.connecte || coupure(e)) break;
           console.warn('Opération abandonnée', op, e);
         }
         file.shift();
@@ -362,6 +391,9 @@ export function creerStore(source, { moi = null, affichage = {} } = {}) {
 
   return store;
 }
+
+/** La bibliothèque de HA signale une connexion perdue par son code 3, seul ou dans un message. */
+const coupure = (e) => e === 3 || e?.code === 3 || e?.error?.code === 3;
 
 const provisoire = (uid) => typeof uid === 'string' && uid.startsWith('tmp-');
 

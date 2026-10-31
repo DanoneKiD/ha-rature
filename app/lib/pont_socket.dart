@@ -5,10 +5,7 @@
 /// http://ip:8123. `wss://` reste ouvert par la page elle-même (coquille.js, `installerPontSocket`).
 library;
 
-import 'dart:async';
 import 'dart:io';
-
-import 'connexion_ha.dart';
 
 class PontSocket {
   PontSocket(this._vers);
@@ -18,10 +15,11 @@ class PontSocket {
   final _sockets = <int, WebSocket>{};
 
   Future<void> ouvrir(int n, String url) async {
-    if (!url.startsWith('ws://')) throw ErreurHA('interne', 'Adresse refusée');
     try {
+      // Seule la page, embarquée, appelle ici ; on n'ouvre rien d'autre qu'un ws://.
+      if (!url.startsWith('ws://')) throw ArgumentError(url);
       final client = HttpClient()..connectionTimeout = const Duration(seconds: 8);
-      final s = await WebSocket.connect(url, customClient: client);
+      final s = await WebSocket.connect(url, customClient: client).timeout(const Duration(seconds: 10));
       _sockets[n] = s;
       _vers(n, 'open');
       s.listen(
@@ -31,7 +29,6 @@ class PontSocket {
           _vers(n, 'close');
         },
         onError: (_) {},
-        cancelOnError: false,
       );
     } catch (_) {
       _vers(n, 'close');

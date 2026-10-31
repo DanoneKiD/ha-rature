@@ -55,6 +55,7 @@ export const TEXTES = {
     'barre.rayons': 'par rayon',
     'barre.ensemble': 'tout ensemble',
     'commun.annuler': 'Annuler',
+    'commun.ok': 'OK',
     'commun.enregistrer': 'Enregistrer',
     'commun.fermer': 'Fermer',
 
@@ -208,6 +209,7 @@ export const TEXTES = {
     'barre.rayons': 'by aisle',
     'barre.ensemble': 'all together',
     'commun.annuler': 'Cancel',
+    'commun.ok': 'OK',
     'commun.enregistrer': 'Save',
     'commun.fermer': 'Close',
 
@@ -361,6 +363,7 @@ export const TEXTES = {
     'barre.rayons': 'nach Abteilung',
     'barre.ensemble': 'alles zusammen',
     'commun.annuler': 'Abbrechen',
+    'commun.ok': 'OK',
     'commun.enregistrer': 'Speichern',
     'commun.fermer': 'Schließen',
 
