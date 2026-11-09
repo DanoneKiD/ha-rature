@@ -156,6 +156,11 @@ class ConnexionHA {
   /// `POST /auth/token`. Un refus (400) veut dire que la connexion a été révoquée côté HA.
   Future<Map<String, dynamic>> _jeton(String url, Map<String, String> formulaire) async {
     final r = await _requete('POST', Uri.parse('$url/auth/token'), formulaire: formulaire);
+    // Seul « invalid_grant » veut dire que HA a révoqué la connexion. Pendant un redémarrage de HA,
+    // le relais Nabu Casa peut répondre 400 ou 403 sans ce corps : la connexion reste bonne.
+    if ((r.statusCode == 400 || r.statusCode == 403) && !r.corps.contains('invalid_grant')) {
+      throw ErreurHA('reseau', 'Home Assistant répond ${r.statusCode}.');
+    }
     if (r.statusCode == 400 || r.statusCode == 403) {
       if (formulaire['grant_type'] == 'refresh_token') {
         _jetons = null;

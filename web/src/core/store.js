@@ -383,10 +383,13 @@ export function creerStore(source, { moi = null, affichage = {} } = {}) {
   function preferee() {
     try {
       const id = localStorage.getItem('rature.liste');
-      return listes.some((l) => l.entity_id === id) ? id : null;
+      if (listes.some((l) => l.entity_id === id)) return id;
     } catch {
-      return null;
+      // stockage indisponible : on retombe sur la liste de courses
     }
+    // Sans choix enregistré, la liste de courses de HA plutôt que la première venue (l'ordre des
+    // entités rendu par HA a changé en 2026.11).
+    return listes.some((l) => l.entity_id === 'todo.shopping_list') ? 'todo.shopping_list' : null;
   }
 
   return store;
